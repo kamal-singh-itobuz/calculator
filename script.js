@@ -1,84 +1,122 @@
-const result = document.querySelector('.result');
-const clear = document.querySelector('.clear');
-const percentage = document.querySelector('.percentage');
-const dot = document.querySelector('.dot');
-const deleteBtn = document.querySelector('.delete');
-const seven = document.querySelector('.seven');
-const eight = document.querySelector('.eight');
-const nine = document.querySelector('.nine');
-const multiply = document.querySelector('.multiply');
-const four = document.querySelector('.four');
-const five = document.querySelector('.five');
-const six = document.querySelector('.six');
-const minus = document.querySelector('.minus');
-const one = document.querySelector('.one');
-const two = document.querySelector('.two');
-const three = document.querySelector('.three');
-const plus = document.querySelector('.plus');
-const zero = document.querySelector('.zero');
-const doubleZero = document.querySelector('.double-zero');
-const equal = document.querySelector('.equal');
-const allKeys = document.querySelector('.all-keys');
+const result = document.querySelector(".result");
+const allKeys = document.querySelector(".all-keys");
 
-const operators = new Set(['+', '-', 'x', '/', '%']);
-const numbers = new Set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '00']);
+const operators = new Set(["+", "-", "x", "/"]);
+const numbers = new Set(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "00",]);
+
+function precedence(op) {
+    if (op === '+') return 0;
+    else if (op === '-') return 1;
+    else if (op === 'x') return 2;
+    else if (op === '/') return 3;
+}
+
+function calculate(a, op, b) {
+    if (op === '+') return a + b;
+    else if (op === '-') return b - a;
+    else if (op === 'x') return a * b;
+    else if (op === '/') return b / a;
+}
+
+function evalArr(arr) {
+    let operandStack = [];
+    let operatorStack = [];
+    arr.forEach(ele => {
+        if (!operators.has(ele)) operandStack.push(ele);
+        else {
+            if (!operatorStack.length) operatorStack.push(ele);
+            else if (operatorStack.length) {
+                if (precedence(ele) >= precedence(operatorStack[operatorStack.length - 1])) operatorStack.push(ele);
+                else {
+                    while (operatorStack.length && precedence(ele) < precedence(operatorStack[operatorStack.length - 1])) {
+                        let a = operandStack.pop();
+                        let b = operandStack.pop();
+                        let op = operatorStack.pop();
+                        operandStack.push(calculate(a, op, b));
+                    }
+                    operatorStack.push(ele);
+                }
+            }
+
+        }
+    });
+    while (operatorStack.length) {
+        let a = operandStack.pop();
+        let b = operandStack.pop();
+        let op = operatorStack.pop();
+        operandStack.push(calculate(a, op, b));
+    }
+    return operandStack.pop();
+}
+
 function evaluate(str) {
     let arr = [];
     let num = "";
-    for(let i=0; i<str.length; i++){
-        if(i !== 0 && operators.has(str[i])){
-            arr.push(num);
+    for (let i = 0; i < str.length; i++) {
+        if (i !== 0 && operators.has(str[i])) {
+            arr.push(Number(num));
             arr.push(str[i]);
             num = "";
-        }
-        else num += str[i];
+        } else num += str[i];
     }
-    arr.push(num);
-    if(arr[1] === '+') return Number(arr[0]) + Number(arr[2]);
-    if(arr[1] === '-') return Number(arr[0]) - Number(arr[2]);
-    if(arr[1] === 'x') return Number(arr[0]) * Number(arr[2]);
-    if(arr[1] === '/') return Number(arr[0]) / Number(arr[2]);
+    arr.push(Number(num));
+    return evalArr(arr);
 }
-let flag = false;
-let prevClick = "";
-allKeys.addEventListener('click', (e) => {
-    let input = result.value;
-    if(e.target.className === 'delete-img') input = input.slice(0, -1);
-    else if(e.target.value === "C"){
-        input = "";
-        result.value = "";
-        flag = false;
-        prevClick = "";
+
+function canAddPoint(str) {
+    for (let i = str.length - 1; i >= 0; i--) {
+        if (operators.has(str[i])) return false;
+        else if (str[i] === ".") return true;
     }
-    else if(numbers.has(e.target.value)){
-        input = result.value;
-        console.log(input);
-        input = input + prevClick + e.target.value;
-        result.value = input;
-    }
-    else if(operators.has(e.target.value)) {
-        input = result.value;
-        console.log(input);
-        if(operators.has(input[input.length-1])){
-            input[input.length-1] = e.target.value;
-            flag = true;
-        }
-        if(!flag) {
-            input += e.target.value;
-            result.value = input;
-            flag = true;
+}
+
+let input = "";
+allKeys.addEventListener("click", (e) => {
+    input = result.value;
+    if (e.target.className === "delete-img") {
+        if (result.value === "undefined") {
+            input = "";
+            result.value = "";
         }
         else {
-            result.value = evaluate(input);
+            result.value = result.value.slice(0, -1);
             input = result.value;
-            prevClick = e.target.value;
         }
     }
-    else if(e.target.value === "=" && flag){
-        input = result.value;
-        result.value = evaluate(input);
-        input = result.value;
-        flag = false;
-        prevClick = "";
+    else if (e.target.value === "C") {
+        input = "";
+        result.value = "";
     }
-})
+    else if (numbers.has(e.target.value)) {
+        if (input[input.length - 1] === ".") {
+            input += e.target.value;
+            result.value = input;
+            return;
+        }
+        if (e.target.value === "00" && (input === "" || input === "0" || !numbers.has(input[input.length - 1]))) return;
+        else if (e.target.value === "0") {
+            if (input === "0") return;
+            if (input[input.length - 1] === "0" && (input.length > 1 && !numbers.has(input[input.length - 2]))) return;
+        }
+        else if (input === "0" || input[input.length - 1] === "0" && (input.length > 1 && !numbers.has(input[input.length - 2]))) input = input.slice(0, -1);
+        input += e.target.value;
+        result.value = input;
+    }
+    else if (!input.length && e.target.value === "-") {
+        input += e.target.value;
+        result.value = input;
+    }
+    else if (input.length && operators.has(e.target.value) && !operators.has(input[input.length - 1])) {
+        input += e.target.value;
+        result.value = input;
+    }
+    else if (e.target.value === "." && !canAddPoint(input)) {
+        input += e.target.value;
+        result.value = input;
+    }
+    else if (e.target.value === "=") {
+        if (!numbers.has(input[input.length - 1])) return;
+        input = evaluate(input);
+        result.value = input;
+    }
+});
