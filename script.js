@@ -26,7 +26,7 @@ function evaluate(str) {
     let arr = [];
     let num = "";
     for(let i=0; i<str.length; i++){
-        if(operators.has(str[i])){
+        if(i !== 0 && operators.has(str[i])){
             arr.push(num);
             arr.push(str[i]);
             num = "";
@@ -40,19 +40,29 @@ function evaluate(str) {
     if(arr[1] === '/') return Number(arr[0]) / Number(arr[2]);
 }
 let flag = false;
-
+let prevClick = "";
 allKeys.addEventListener('click', (e) => {
     let input = result.value;
     if(e.target.className === 'delete-img') input = input.slice(0, -1);
     else if(e.target.value === "C"){
         input = "";
         result.value = "";
+        flag = false;
+        prevClick = "";
     }
     else if(numbers.has(e.target.value)){
-        input += e.target.value;
+        input = result.value;
+        console.log(input);
+        input = input + prevClick + e.target.value;
         result.value = input;
     }
     else if(operators.has(e.target.value)) {
+        input = result.value;
+        console.log(input);
+        if(operators.has(input[input.length-1])){
+            input[input.length-1] = e.target.value;
+            flag = true;
+        }
         if(!flag) {
             input += e.target.value;
             result.value = input;
@@ -60,73 +70,15 @@ allKeys.addEventListener('click', (e) => {
         }
         else {
             result.value = evaluate(input);
-            input = result.value + e.target.value;
+            input = result.value;
+            prevClick = e.target.value;
         }
     }
-//     else if(e.target.value === "+"){
-//         if(!flag){
-//             input += "+";
-//             result.value = input;
-//             flag = true;
-//         }
-//         else {
-//             input = evaluate(input);
-//             result.value = input;
-//         }
-//         return;
-//     }
-//     else if(e.target.value === "-"){
-//         if(!flag){
-//             input += "-";
-//             result.value = input;
-//             flag = true;
-//         }
-//         else {
-//             input = evaluate(input);
-//             result.value = input;
-//         }
-//         return;
-//     }
-//     else if(e.target.value === "x"){
-//         if(!flag){
-//             input += "x";
-//             result.value = input;
-//             flag = true;
-//         }
-//         else {
-//             input = evaluate(input);
-//             result.value = input;
-//         }
-//         return;
-//     }
-//     else if(e.target.value === "/"){
-//         if(!flag){
-//             input += "/";
-//             result.value = input;
-//             flag = true;
-//         }
-//         else {
-//             input = evaluate(input);
-//             result.value = input;
-//         }
-//         return;
-//     }
-//     else if(e.target.value === "%"){
-//         if(!flag){
-//             input += "%";
-//             result.value = input;
-//             flag = true;
-//         }
-//         else {
-//             input = evaluate(input);
-//             result.value = input;
-//         }
-//         return;
-//     }
-//     else if(e.target.value === "=" && flag){
-//         input = evaluate(input);
-//         result.value = input;
-//         return;
-//     }
-//     result.value = input;
+    else if(e.target.value === "=" && flag){
+        input = result.value;
+        result.value = evaluate(input);
+        input = result.value;
+        flag = false;
+        prevClick = "";
+    }
 })
