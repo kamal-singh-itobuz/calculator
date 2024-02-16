@@ -18,7 +18,7 @@ function calculate(a, op, b) {
     else if (op === '/') return b / a;
 }
 
-function evalArr(arr) {
+function evaluateArray(arr) {
     let operandStack = [];
     let operatorStack = [];
     arr.forEach(ele => {
@@ -29,10 +29,10 @@ function evalArr(arr) {
                 if (precedence(ele) >= precedence(operatorStack[operatorStack.length - 1])) operatorStack.push(ele);
                 else {
                     while (operatorStack.length && precedence(ele) < precedence(operatorStack[operatorStack.length - 1])) {
-                        let a = operandStack.pop();
-                        let b = operandStack.pop();
+                        let num1 = operandStack.pop();
+                        let num2 = operandStack.pop();
                         let op = operatorStack.pop();
-                        operandStack.push(calculate(a, op, b));
+                        operandStack.push(calculate(num1, op, num2));
                     }
                     operatorStack.push(ele);
                 }
@@ -41,10 +41,10 @@ function evalArr(arr) {
         }
     });
     while (operatorStack.length) {
-        let a = operandStack.pop();
-        let b = operandStack.pop();
+        let num1 = operandStack.pop();
+        let num2 = operandStack.pop();
         let op = operatorStack.pop();
-        operandStack.push(calculate(a, op, b));
+        operandStack.push(calculate(num1, op, num2));
     }
     return operandStack.pop();
 }
@@ -60,7 +60,7 @@ function evaluate(str) {
         } else num += str[i];
     }
     arr.push(Number(num));
-    return evalArr(arr);
+    return evaluateArray(arr);
 }
 
 function canAddPoint(str) {
@@ -103,16 +103,8 @@ allKeys.addEventListener("click", (e) => {
         result.value = input;
     }
     else if(e.target.value === "-"){
-        if(input === ""){
-            input += e.target.value;
-            result.value = input;
-        }
-        else if(input[input.length-1] === ".") return;
-        else if(numbers.has(input[input.length-1])) {
-            input += e.target.value;
-            result.value = input;
-        }
-        else if(input[input.length-1] === "x" || input[input.length-1] === "/"){
+        if(input[input.length-1] === ".") return;
+        else if(input === "" || numbers.has(input[input.length-1]) || input[input.length-1] === "x" || input[input.length-1] === "/") {
             input += e.target.value;
             result.value = input;
         }
