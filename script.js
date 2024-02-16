@@ -53,7 +53,7 @@ function evaluate(str) {
     let arr = [];
     let num = "";
     for (let i = 0; i < str.length; i++) {
-        if (i !== 0 && operators.has(str[i])) {
+        if (i !== 0 && num !== "" && operators.has(str[i])) {
             arr.push(Number(num));
             arr.push(str[i]);
             num = "";
@@ -74,7 +74,7 @@ let input = "";
 allKeys.addEventListener("click", (e) => {
     input = result.value;
     if (e.target.className === "delete-img") {
-        if (result.value === "undefined") {
+        if (result.value === "undefined" || result.value === "Infinity" || result.value === "NaN") {
             input = "";
             result.value = "";
         }
@@ -88,12 +88,12 @@ allKeys.addEventListener("click", (e) => {
         result.value = "";
     }
     else if (numbers.has(e.target.value)) {
-        if (input[input.length - 1] === ".") {
+        if (input[input.length - 1] === "." || (input[input.length - 1] === "0" && (input.length > 1 && input[input.length - 2] === "."))) {
             input += e.target.value;
             result.value = input;
             return;
         }
-        if (e.target.value === "00" && (input === "" || input === "0" || !numbers.has(input[input.length - 1]))) return;
+        else if (e.target.value === "00" && (input === "" || input === "0" || !numbers.has(input[input.length - 1]))) return;
         else if (e.target.value === "0") {
             if (input === "0") return;
             if (input[input.length - 1] === "0" && (input.length > 1 && !numbers.has(input[input.length - 2]))) return;
@@ -102,20 +102,60 @@ allKeys.addEventListener("click", (e) => {
         input += e.target.value;
         result.value = input;
     }
-    else if (!input.length && e.target.value === "-") {
-        input += e.target.value;
-        result.value = input;
+    else if(e.target.value === "-"){
+        if(input === ""){
+            input += e.target.value;
+            result.value = input;
+        }
+        else if(input[input.length-1] === ".") return;
+        else if(numbers.has(input[input.length-1])) {
+            input += e.target.value;
+            result.value = input;
+        }
+        else if(input[input.length-1] === "x" || input[input.length-1] === "/"){
+            input += e.target.value;
+            result.value = input;
+        }
+        else if(input[input.length-1] === "+"){
+            input = input.slice(0, -1);
+            input += e.target.value;
+            result.value = input;
+        }
     }
-    else if (input.length && operators.has(e.target.value) && !operators.has(input[input.length - 1])) {
-        input += e.target.value;
-        result.value = input;
+    else if(operators.has(e.target.value) && e.target.value !== "-"){
+        if(input === "" || input[input.length-1] === ".") return;
+        else if(numbers.has(input[input.length-1])){
+            input += e.target.value;
+            result.value = input;
+        }
+        else if(operators.has(input[input.length-1])) {
+            if(input.length > 1 && operators.has(input[input.length-2])) return;
+            input = input.slice(0, -1);
+            input += e.target.value;
+            result.value = input;
+        }
     }
     else if (e.target.value === "." && !canAddPoint(input)) {
         input += e.target.value;
         result.value = input;
     }
+    else if (e.target.value === "Sqrt") {
+        if(input.length > 0 && (!numbers.has(input[input.length - 1]) || input[input.length-1] === ".")) return;
+        input = Math.sqrt(evaluate(input));
+        result.value = input;
+    }
+    else if (e.target.value === "%") {
+        if(input.length > 0 && (!numbers.has(input[input.length - 1]) || input[input.length-1] === ".")) return;
+        input = evaluate(input)/100;
+        result.value = input;
+    }
+    else if (e.target.value === "+/-") {
+        if(input.length > 0 && (!numbers.has(input[input.length - 1]) || input[input.length-1] === ".")) return;
+        input = -evaluate(input);
+        result.value = input;
+    }
     else if (e.target.value === "=") {
-        if (!numbers.has(input[input.length - 1])) return;
+        if (input.length > 0 && !numbers.has(input[input.length - 1])) return;
         input = evaluate(input);
         result.value = input;
     }
