@@ -22,7 +22,7 @@ input {
 .calculator {
     width: 90%;
     background-color: $calculator-bg-color;
-    margin-top: 5rem;
+    margin-top: 4rem;
 
     .input-output {
         input {
@@ -50,6 +50,8 @@ input {
     input {
         font-size: 1.3rem;
         height: 3rem;
+        background-color: $body-bg-color;
+        color: white;
     }
 }
 

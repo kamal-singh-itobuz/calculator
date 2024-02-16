@@ -19,7 +19,7 @@ input {
 .calculator {
   width: 90%;
   background-color: #219ebc;
-  margin-top: 5rem;
+  margin-top: 4rem;
 }
 .calculator .input-output input {
   text-align: right;
@@ -41,6 +41,8 @@ input {
 .all-keys input {
   font-size: 1.3rem;
   height: 3rem;
+  background-color: #023047;
+  color: white;
 }
 
 @media (min-width: 600px) {

@@ -1,7 +1,7 @@
 const result = document.querySelector(".result");
 const allKeys = document.querySelector(".all-keys");
 
-const operators = new Set(["+", "-", "x", "/"]);
+const operators = new Set(["+", "-", "x", "/", "^"]);
 const numbers = new Set(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "00",]);
 
 function precedence(op) {
@@ -9,6 +9,7 @@ function precedence(op) {
     else if (op === '-') return 1;
     else if (op === 'x') return 2;
     else if (op === '/') return 3;
+    else if (op === '^') return 4;
 }
 
 function calculate(a, op, b) {
@@ -16,6 +17,7 @@ function calculate(a, op, b) {
     else if (op === '-') return b - a;
     else if (op === 'x') return a * b;
     else if (op === '/') return b / a;
+    else if (op === '^') return Math.pow(b, a);
 }
 
 function evaluateArray(arr) {
@@ -74,7 +76,7 @@ let input = "";
 allKeys.addEventListener("click", (e) => {
     input = result.value;
     if (e.target.className === "delete-img") {
-        if (result.value === "undefined" || result.value === "Infinity" || result.value === "NaN") {
+        if (result.value === "undefined" || result.value === "Infinity" || result.value === "-Infinity" || result.value === "NaN") {
             input = "";
             result.value = "";
         }
@@ -104,7 +106,7 @@ allKeys.addEventListener("click", (e) => {
     }
     else if(e.target.value === "-"){
         if(input[input.length-1] === ".") return;
-        else if(input === "" || numbers.has(input[input.length-1]) || input[input.length-1] === "x" || input[input.length-1] === "/") {
+        else if(input === "" || numbers.has(input[input.length-1]) || input[input.length-1] === "x" || input[input.length-1] === "/" || input[input.length-1] === "^") {
             input += e.target.value;
             result.value = input;
         }
