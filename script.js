@@ -154,3 +154,8 @@ allKeys.addEventListener("click", (e) => {
         result.value = input;
     }
 });
+
+result.addEventListener('keydown', (e) => {
+    e.preventDefault();
+    return false;
+});
